@@ -1,0 +1,86 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Region {
+  id            Int                  @id @default(autoincrement())
+  name          String               @db.VarChar(150)
+  regionType    String               @default("CITY") @db.VarChar(30)
+  country       String               @default("India") @db.VarChar(100)
+  state         String?              @db.VarChar(100)
+  latitude      Float?
+  longitude     Float?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  observations  WeatherObservation[]
+
+  @@index([name])
+}
+
+model WeatherDataSource {
+  id           Int                  @id @default(autoincrement())
+  provider     String               @db.VarChar(100)
+  dataset      String               @db.VarChar(100)
+  latitude     Float
+  longitude    Float
+  timezone     String               @default("auto") @db.VarChar(100)
+  coverageStart String              @db.VarChar(10)
+  coverageEnd   String              @db.VarChar(10)
+  quality      Json
+  createdAt    DateTime             @default(now())
+  observations ClimateObservation[]
+
+  @@unique([provider, dataset, latitude, longitude, coverageStart, coverageEnd], map: "weather_source_cache_key")
+}
+
+model ClimateObservation {
+  id              Int              @id @default(autoincrement())
+  sourceId        Int
+  observationDate String           @db.VarChar(10)
+  temperatureMax  Float?
+  rawPayload      Json
+  createdAt       DateTime         @default(now())
+  source          WeatherDataSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, observationDate])
+  @@index([observationDate])
+}
+
+model WeatherObservation {
+  id              Int      @id @default(autoincrement())
+  regionId        Int
+  observedAt      DateTime @db.Date
+  maxTemperature  Float?
+  minTemperature  Float?
+  meanTemperature Float?
+  precipitation   Float?
+  source          String   @default("Open-Meteo") @db.VarChar(50)
+  createdAt       DateTime @default(now())
+
+  region Region @relation(fields: [regionId], references: [id], onDelete: Cascade)
+
+  @@unique([regionId, observedAt])
+  @@index([observedAt])
+}
+
+model ClimateAnalysis {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  location  String   @db.VarChar(255)
+  startYear Int
+  endYear   Int
+  hazard    String   @default("Heatwave") @db.VarChar(50)
+  status    String   @default("completed") @db.VarChar(30)
+  payload   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt])
+}
