@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -6,6 +7,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  serverExternalPackages: ["@prisma/client", "prisma"],
+};
 
-export default nextConfig
+export default nextConfig;
