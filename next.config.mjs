@@ -12,9 +12,16 @@ const nextConfig = {
   serverExternalPackages: ["@prisma/client", "prisma"],
 
   outputFileTracingIncludes: {
-    "/api/**/*": ["./lib/generated/prisma/**/*"],
-    "/*": ["./lib/generated/prisma/**/*"],
-  },
+  "/api/analyses": [
+    "./lib/generated/prisma/**/*",
+  ],
+  "/api/**/*": [
+    "./lib/generated/prisma/**/*",
+  ],
+  "/*": [
+    "./lib/generated/prisma/**/*",
+  ],
+},
 };
 
 export default nextConfig;
