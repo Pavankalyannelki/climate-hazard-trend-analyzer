@@ -8,6 +8,9 @@ const nextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: ["@prisma/client", "prisma"],
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./lib/generated/prisma/**/*"],
+  },
 };
 
 export default nextConfig;
